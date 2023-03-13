@@ -1,0 +1,6 @@
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.molecule.co.stockflash&hl=en_US, com.molecule.co.stockflash, https://stockviva.com, stockviva.com, True
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.molecule.co.stockflash&hl=en_US, com.molecule.co.stockflash, cs@stockviva.com, stockviva.com, True
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.molecule.co.stockflash&hl=en_US, com.molecule.co.stockflash, https://static.stockviva.com/privacy.html?lang=zh, static.stockviva.com, False
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.sutou.app.stockvivaim.tio.ab, com.sutou.app.stockvivaim.tio.ab, rowsshanine@gmail.com, gmail.com, False
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.sutou.app.stockvivaim.tio.ab, com.sutou.app.stockvivaim.tio.ab, https://sites.google.com/view/stock-sutou/home, sites.google.com, False
+256456, playstore, stockviva.com, https://play.google.com/store/apps/details?id=com.molecule.co.stockflash&hl=gsw&gl=US, com.molecule.co.stockflash, https://stockviva.com, stockviva.com, True

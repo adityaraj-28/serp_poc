@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 
 SERP_DIV_CLASS = "yuRUbf"
 
@@ -14,6 +14,15 @@ def extract_websites_from_linkedin():
     return website_list
 
 
+def extract_websites_from_playstore():
+    soup = BeautifulSoup(unblocker_res.text, 'html.parser')
+    website_list = []
+    for div in soup.find_all('div', {'class': 'pZ8Djf'}):
+        if div.find('div', {'class': 'xFVDSb'}).text in ['Website', 'Email', 'Privacy policy']:
+            website_list.append(div.find('div', {'class': 'pSEeg'}).text)
+    return website_list
+
+
 def serp_datasource_id_from_linkedin_url(url):
     if url[-1] == '/':
         url = url[:-1]
@@ -22,12 +31,21 @@ def serp_datasource_id_from_linkedin_url(url):
     return _domain
 
 
+def serp_datasource_id_from_playstore_url(url):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    app_id = query_params['id'][0]
+    return app_id
+
+
 unblocker_dict = {
-    'linkedin': extract_websites_from_linkedin
+    'linkedin': extract_websites_from_linkedin,
+    'playstore': extract_websites_from_playstore
 }
 
 datasource_serp_id_extractor = {
-    'linkedin': serp_datasource_id_from_linkedin_url
+    'linkedin': serp_datasource_id_from_linkedin_url,
+    'playstore': serp_datasource_id_from_playstore_url
 }
 
 
@@ -42,10 +60,16 @@ def extract_url_from_serp_res():
 
 
 def create_output_file_entry():
-    extracted_domain = urlparse(website).netloc
     domain_matching = 'True' if domain == extracted_domain else 'False'
     _row = f'{company_id}, {data_source}, {domain}, {unblocker_url}, {serp_data_source_id}, {website}, {extracted_domain}, {domain_matching}\n'
     file_name_dict[data_source].write(_row)
+
+
+def extract_domain():
+    _extracted_domain = urlparse(website).netloc
+    if '@' in website:
+        _extracted_domain = website.split('@')[1]
+    return _extracted_domain
 
 
 if __name__ == '__main__':
@@ -56,7 +80,6 @@ if __name__ == '__main__':
         file_name_dict[association] = open(f'{association}.txt', 'w+')
     error_file = open('errors.txt', 'w+')
     session = requests.Session()
-    # required columns company_id, entity, domain
     for index, row in df.iterrows():
         domain = row['domain']
         company_id = row['company_id']
@@ -80,8 +103,8 @@ if __name__ == '__main__':
                 serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                 websites = unblocker_dict[data_source]()
                 for website in websites:
+                    extracted_domain = extract_domain()
                     create_output_file_entry()
-            break
         except Exception as e:
             error_file.write(f'{company_id}, {company_id}, {data_source}, {google_query} : {str(e)}\n')
 
