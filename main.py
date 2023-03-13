@@ -23,29 +23,43 @@ def extract_websites_from_playstore():
     return website_list
 
 
-def serp_datasource_id_from_linkedin_url(url):
+def extract_websites_from_pitchbook():
+    soup = BeautifulSoup(unblocker_res.text, 'html.parser')
+    a_tag = soup.find("a", {"class": "d-block-XL font-underline", "aria-label": "Website link"})
+    return [a_tag["href"]]
+
+
+def remove_ending_slash_from_url(url):
     if url[-1] == '/':
         url = url[:-1]
+    return url
+
+
+def serp_datasource_id_from_linkedin_url(url):
+    url = remove_ending_slash_from_url(url)
     path = urlparse(url).path
-    _domain = path.split('/')[-1]
-    return _domain
+    data_source_ids = path.split('/')[-1]
+    return data_source_ids
 
 
 def serp_datasource_id_from_playstore_url(url):
+    url = remove_ending_slash_from_url(url)
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
-    app_id = query_params['id'][0]
-    return app_id
+    data_source_ids = query_params['id'][0]
+    return data_source_ids
 
 
 unblocker_dict = {
     'linkedin': extract_websites_from_linkedin,
-    'playstore': extract_websites_from_playstore
+    'playstore': extract_websites_from_playstore,
+    'pitchbook': extract_websites_from_pitchbook
 }
 
 datasource_serp_id_extractor = {
     'linkedin': serp_datasource_id_from_linkedin_url,
-    'playstore': serp_datasource_id_from_playstore_url
+    'playstore': serp_datasource_id_from_playstore_url,
+    'pitchbook': serp_datasource_id_from_linkedin_url
 }
 
 
@@ -69,6 +83,7 @@ def extract_domain():
     _extracted_domain = urlparse(website).netloc
     if '@' in website:
         _extracted_domain = website.split('@')[1]
+    _extracted_domain = _extracted_domain.removeprefix('www.')
     return _extracted_domain
 
 
