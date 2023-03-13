@@ -1,3 +1,0 @@
-31295, pitchbook, musiclife.io, https://pitchbook.com/profiles/company/232244-38, 232244-38, http://www.musiclife.io, musiclife.io, True
-31295, pitchbook, musiclife.io, https://pitchbook.com/profiles/company/60402-88, 60402-88, http://www.fujimediahd.co.jp, fujimediahd.co.jp, False
-31295, pitchbook, musiclife.io, https://pitchbook.com/profiles/company/123700-42, 123700-42, http://www.atticamediagroup.gr, atticamediagroup.gr, False

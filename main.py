@@ -2,6 +2,10 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
+from time import time
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 SERP_DIV_CLASS = "yuRUbf"
 
@@ -92,10 +96,11 @@ if __name__ == '__main__':
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
     for association in associations:
-        file_name_dict[association] = open(f'{association}.txt', 'w+')
-    error_file = open('errors.txt', 'w+')
+        file_name_dict[association] = open(f'{association}.txt', 'w+', 1)
+    error_file = open('errors.txt', 'w+', 1)
     session = requests.Session()
     for index, row in df.iterrows():
+        start_time = time()
         domain = row['domain']
         company_id = row['company_id']
         data_source = row['entity']
@@ -120,8 +125,11 @@ if __name__ == '__main__':
                 for website in websites:
                     extracted_domain = extract_domain()
                     create_output_file_entry()
+            end_time = time()
+            logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
         except Exception as e:
-            error_file.write(f'{company_id}, {company_id}, {data_source}, {google_query} : {str(e)}\n')
+            logging.error(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
+            error_file.write(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}\n')
 
     session.close()
     error_file.close()
