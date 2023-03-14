@@ -59,6 +59,7 @@ def remove_ending_slash_from_url(url):
 def serp_datasource_id_from_linkedin_url(url):
     url = remove_ending_slash_from_url(url)
     path = urlparse(url).path
+    path = remove_ending_slash_from_url(path)
     data_source_ids = path.split('/')[-1]
     return data_source_ids
 
@@ -128,7 +129,6 @@ def extract_domain(url):
 
 if __name__ == '__main__':
     df = pd.read_csv('serp_sample.csv')
-    df = df.sample(n=10)
     base_start_time = time()
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
@@ -149,7 +149,7 @@ if __name__ == '__main__':
                 "https": "https://brd-customer-hl_387a0b46-zone-serp_zone:7j5tinf2e6il@zproxy.lum-superproxy.io:22225",
             }
 
-            response = session.get(serp_url, proxies=serp_proxies, verify=False, timeout=10)
+            response = session.get(serp_url, proxies=serp_proxies, verify=False, timeout=15)
             # it returns 10 results by default
             unblocker_urls = extract_url_from_serp_res()
             unblocker_proxies = {
@@ -157,13 +157,18 @@ if __name__ == '__main__':
             }
             logging.info(f'unblocker urls extracted for {domain}, {data_source}')
             for unblocker_url in unblocker_urls:
-                unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False, timeout=10)
-                serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
-                websites = unblocker_dict[data_source]()
-                logging.info(f'websites extracted from {unblocker_url}')
-                for website in websites:
-                    extracted_domain = extract_domain(website)
-                    create_output_file_entry()
+                try:
+                    unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False, timeout=15)
+                    serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
+                    websites = unblocker_dict[data_source]()
+                    logging.info(f'websites extracted from {unblocker_url}')
+                    for website in websites:
+                        extracted_domain = extract_domain(website)
+                        create_output_file_entry()
+                except Exception as e:
+                    logging.error(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
+                    error_file.write(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url}: {str(e)}\n')
+
             end_time = time()
             logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
         except Exception as e:
