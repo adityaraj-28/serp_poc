@@ -22,11 +22,11 @@ def extract_websites_from_linkedin():
 
 def extract_websites_from_playstore():
     soup = BeautifulSoup(unblocker_res.text, 'html.parser')
-    website_list = []
+    website_list = set()
     for div in soup.find_all('div', {'class': 'pZ8Djf'}):
         if div.find('div', {'class': 'xFVDSb'}).text in ['Website', 'Email', 'Privacy policy']:
-            website_list.append(div.find('div', {'class': 'pSEeg'}).text)
-    return website_list
+            website_list.add(div.find('div', {'class': 'pSEeg'}).text)
+    return list(website_list)
 
 
 def extract_websites_from_pitchbook():
@@ -37,11 +37,11 @@ def extract_websites_from_pitchbook():
 
 def extract_websites_from_appstore():
     soup = BeautifulSoup(unblocker_res.text, 'html.parser')
-    website_list = []
+    website_list = set()
     for a in soup.find_all('a', {'class': 'link icon icon-after icon-external'}):
         if 'Developer Website' in a.text or 'App Support' in a.text or 'Privacy Policy' in a.text:
-            website_list.append(a['href'])
-    return website_list
+            website_list.add(a['href'])
+    return list(website_list)
 
 
 def extract_websites_from_glassdoor():
@@ -128,7 +128,7 @@ def extract_domain(url):
 
 if __name__ == '__main__':
     df = pd.read_csv('serp_sample.csv')
-    df = df.sample(n=10)
+    # df = df.sample(n=1)
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
     for association in associations:
@@ -148,14 +148,14 @@ if __name__ == '__main__':
                 "https": "https://brd-customer-hl_387a0b46-zone-serp_zone:7j5tinf2e6il@zproxy.lum-superproxy.io:22225",
             }
 
-            response = session.get(serp_url, proxies=serp_proxies, verify=False)
+            response = session.get(serp_url, proxies=serp_proxies, verify=False, timeout=10)
             # it returns 10 results by default
             unblocker_urls = extract_url_from_serp_res()
             unblocker_proxies = {
                 'https': 'http://brd-customer-hl_387a0b46-zone-unblocker_1:y1ibmxaapy29@zproxy.lum-superproxy.io:22225'
             }
             for unblocker_url in unblocker_urls:
-                unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False)
+                unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False, timeout=10)
                 serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                 websites = unblocker_dict[data_source]()
                 for website in websites:
