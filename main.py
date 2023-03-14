@@ -5,6 +5,7 @@ from urllib.parse import urlparse, parse_qs
 from time import time
 import logging
 import tldextract
+import re
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -34,6 +35,21 @@ def extract_websites_from_pitchbook():
     return [a_tag["href"]]
 
 
+def extract_websites_from_appstore():
+    soup = BeautifulSoup(unblocker_res.text, 'html.parser')
+    website_list = []
+    for a in soup.find_all('a', {'class': 'link icon icon-after icon-external'}):
+        if 'Developer Website' in a.text or 'App Support' in a.text or 'Privacy Policy' in a.text:
+            website_list.append(a['href'])
+    return website_list
+
+
+def extract_websites_from_glassdoor():
+    soup = BeautifulSoup(unblocker_res.text, 'html.parser')
+    a_tag = soup.find('a', {'data-test': 'employer-website'})
+    return [a_tag["href"]]
+
+
 def remove_ending_slash_from_url(url):
     if url[-1] == '/':
         url = url[:-1]
@@ -55,16 +71,37 @@ def serp_datasource_id_from_playstore_url(url):
     return data_source_ids
 
 
+def serp_datasource_id_from_appstore_url(url):
+    url = remove_ending_slash_from_url(url)
+    path = urlparse(url).path
+    data_source_ids = path.split('/')[-1]
+    data_source_ids = str(data_source_ids).removeprefix('id')
+    return data_source_ids
+
+
+def serp_datasource_id_from_glassdoor_url(url):
+    url = remove_ending_slash_from_url(url)
+    url = url.removesuffix('.htm')
+    path = urlparse(url).path
+    last_part = str(path.split('/')[-1])
+    match = re.search(r"EI_IE(\d+)\.", last_part)
+    return match.group(1)
+
+
 unblocker_dict = {
     'linkedin': extract_websites_from_linkedin,
     'playstore': extract_websites_from_playstore,
-    'pitchbook': extract_websites_from_pitchbook
+    'pitchbook': extract_websites_from_pitchbook,
+    'appstore': extract_websites_from_appstore,
+    'glassdoor': extract_websites_from_glassdoor
 }
 
 datasource_serp_id_extractor = {
     'linkedin': serp_datasource_id_from_linkedin_url,
     'playstore': serp_datasource_id_from_playstore_url,
-    'pitchbook': serp_datasource_id_from_linkedin_url
+    'pitchbook': serp_datasource_id_from_linkedin_url,
+    'appstore': serp_datasource_id_from_appstore_url,
+    'glassdoor': serp_datasource_id_from_glassdoor_url
 }
 
 
