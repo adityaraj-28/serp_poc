@@ -187,12 +187,12 @@ if __name__ == '__main__':
         except Exception as e:
             logging.error(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
             error_file.write(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}\n')
-
+    base_end_time = time()
+    success_file.write(f'Total time take: {base_end_time - base_start_time}\n')
+    logging.info(f'Total time take: {base_end_time - base_start_time}')
     session.close()
     error_file.close()
     success_file.close()
     for file in file_name_dict.values():
         file.close()
-    base_end_time = time()
-    success_file.write(f'Total time take: {base_end_time - base_start_time}\n')
-    logging.info(f'Total time take: {base_end_time - base_start_time}')
+
