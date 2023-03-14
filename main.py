@@ -6,6 +6,8 @@ from time import time
 import logging
 import tldextract
 import re
+import sys
+import os
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -128,13 +130,21 @@ def extract_domain(url):
 
 
 if __name__ == '__main__':
-    df = pd.read_csv('serp_sample.csv')
+    arg_length = len(sys.argv)
+    if arg_length != 2:
+        logging.error('Incorrect number of arguments')
+        exit()
+
+    index = sys.argv[1]
+    df = pd.read_csv(os.path.join('input', f'input_{index}.csv'))
     base_start_time = time()
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
     for association in associations:
-        file_name_dict[association] = open(f'{association}.txt', 'w+', 1)
-    error_file = open('errors.txt', 'w+', 1)
+        file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'w+', 1)
+    error_file = open(os.path.join('error', f'errors_{index}.txt'), 'w+', 1)
+    success_file = open(os.path.join('success', f'success_{index}.txt'), 'w+', 1)
+
     session = requests.Session()
     for index, row in df.iterrows():
         start_time = time()
@@ -155,12 +165,14 @@ if __name__ == '__main__':
             unblocker_proxies = {
                 'https': 'http://brd-customer-hl_387a0b46-zone-unblocker_1:y1ibmxaapy29@zproxy.lum-superproxy.io:22225'
             }
+            success_file.write(f'unblocker urls extracted for {domain}, {data_source}\n')
             logging.info(f'unblocker urls extracted for {domain}, {data_source}')
             for unblocker_url in unblocker_urls:
                 try:
                     unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False, timeout=15)
                     serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                     websites = unblocker_dict[data_source]()
+                    success_file.write(f'websites extracted from {unblocker_url}\n')
                     logging.info(f'websites extracted from {unblocker_url}')
                     for website in websites:
                         extracted_domain = extract_domain(website)
@@ -170,6 +182,7 @@ if __name__ == '__main__':
                     error_file.write(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url}: {str(e)}\n')
 
             end_time = time()
+            success_file.write(f'{company_id}, {data_source}, Time taken: {end_time - start_time}\n')
             logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
         except Exception as e:
             logging.error(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
@@ -177,7 +190,9 @@ if __name__ == '__main__':
 
     session.close()
     error_file.close()
+    success_file.close()
     for file in file_name_dict.values():
         file.close()
     base_end_time = time()
+    success_file.write(f'Total time take: {base_end_time - base_start_time}\n')
     logging.info(f'Total time take: {base_end_time - base_start_time}')
