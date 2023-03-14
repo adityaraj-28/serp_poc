@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 from time import time
 import logging
+import tldextract
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -83,12 +84,9 @@ def create_output_file_entry():
     file_name_dict[data_source].write(_row)
 
 
-def extract_domain():
-    _extracted_domain = urlparse(website).netloc
-    if '@' in website:
-        _extracted_domain = website.split('@')[1]
-    _extracted_domain = _extracted_domain.removeprefix('www.')
-    return _extracted_domain
+def extract_domain(url):
+    ext = tldextract.extract(url)
+    return f'{ext.domain}.{ext.suffix}'
 
 
 if __name__ == '__main__':
@@ -123,7 +121,7 @@ if __name__ == '__main__':
                 serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                 websites = unblocker_dict[data_source]()
                 for website in websites:
-                    extracted_domain = extract_domain()
+                    extracted_domain = extract_domain(website)
                     create_output_file_entry()
             end_time = time()
             logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
