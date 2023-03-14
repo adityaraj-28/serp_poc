@@ -128,6 +128,7 @@ def extract_domain(url):
 
 if __name__ == '__main__':
     df = pd.read_csv('serp_sample.csv')
+    df = df.sample(n=10)
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
     for association in associations:

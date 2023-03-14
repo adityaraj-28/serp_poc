@@ -1,0 +1,10 @@
+138590, glassdoor, cleancroptech.com, https://www.glassdoor.com/Overview/Working-at-Clean-Crop-Technologies-EI_IE5225280.11,34.htm, 5225280, https://cleancroptech.com/, cleancroptech.com, True
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Helloworld-Technologies-EI_IE2982615.11,34.htm, 2982615, http://www.thehelloworld.com, thehelloworld.com, True
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-EI_IE1103117.11,22.htm, 1103117, http://www.shophelloworld.com, shophelloworld.com, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-OR-EI_IE1932685.11,25.htm, 1932685, http://www.helloworlddevs.com, helloworlddevs.com, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-Fashion-EI_IE2387078.11,30.htm, 2387078, http://www.helloworldfashion.com, helloworldfashion.com, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Helloworld-Travel-EI_IE1731227.11,28.htm, 1731227, http://www.helloworld.com.au, helloworld.com.au, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-Language-Center-EI_IE275280.11,38.htm, 275280, http://www.helloworld.edu, helloworld.edu, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-Communications-EI_IE1824257.11,37.htm, 1824257, http://www.hwc.tv, hwc.tv, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-Nepal-EI_IE4197152.11,28.htm, 4197152, http://helloworldcorp.com.np, helloworldcorp.com.np, False
+95986, glassdoor, thehelloworld.com, https://www.glassdoor.com/Overview/Working-at-Hello-World-Group-EI_IE1617825.11,28.htm, 1617825, http://helloworldgroup.co.uk, helloworldgroup.co.uk, False

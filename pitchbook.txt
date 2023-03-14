@@ -1,0 +1,6 @@
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/470488-24, 470488-24, http://www.mangata.finance, mangata.finance, True
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/439201-36, 439201-36, http://www.mangatanetworks.com, mangatanetworks.com, False
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/54186-94, 54186-94, http://www.mangata.com.pl, mangata.com.pl, False
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/482820-31, 482820-31, http://masterform.pl, masterform.pl, False
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/58587-22, 58587-22, http://www.srubena.com.pl, srubena.com.pl, False
+192383, pitchbook, mangata.finance, https://pitchbook.com/profiles/company/58587-31, 58587-31, http://www.kuzniapolska.com, kuzniapolska.com, False

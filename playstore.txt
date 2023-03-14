@@ -1,0 +1,10 @@
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=en_US, com.lyte.charging, https://lyte.city, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=en_US, com.lyte.charging, app@lyte.city, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=en_US, com.lyte.charging, https://lyte.city/privacy/, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=uz, com.lyte.charging, app@lyte.city, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=gsw&gl=US, com.lyte.charging, https://lyte.city, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lilithgames.xgame.gp&hl=en_US, com.lilithgames.xgame.gp, https://dislyte.farlightgames.com/, farlightgames.com, False
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lilithgames.xgame.gp&hl=en_US, com.lilithgames.xgame.gp, dislyte-service@lilith.com, lilith.com, False
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lilithgames.xgame.gp&hl=en_US, com.lilithgames.xgame.gp, https://www.lilithgames.com/privacy?locale=en-US, lilithgames.com, False
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=pt_PT&gl=US, com.lyte.charging, https://lyte.city, lyte.city, True
+252074, playstore, lyte.city, https://play.google.com/store/apps/details?id=com.lyte.charging&hl=pt_PT&gl=US, com.lyte.charging, app@lyte.city, lyte.city, True
