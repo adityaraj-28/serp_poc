@@ -8,8 +8,9 @@ import tldextract
 import re
 import sys
 import os
+from time import sleep
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 SERP_DIV_CLASS = "yuRUbf"
 
@@ -121,12 +122,29 @@ def extract_url_from_serp_res():
 def create_output_file_entry():
     domain_matching = 'True' if domain == extracted_domain else 'False'
     _row = f'{company_id}, {data_source}, {domain}, "{unblocker_url}", {serp_data_source_id}, {website}, {extracted_domain}, {domain_matching}\n'
+    logging.info(f'entry: {_row}')
     file_name_dict[data_source].write(_row)
+    file_name_dict[data_source].flush()
 
 
 def extract_domain(url):
     ext = tldextract.extract(url)
     return f'{ext.domain}.{ext.suffix}'
+
+
+def retry_for_non_200(url, proxies, verify, timeout):
+    tries = 0
+    while True:
+        res = session.get(url, proxies=proxies, verify=verify, timeout=timeout)
+        tries = tries+1
+        if res.status_code == 200:
+            break
+        elif tries == 3:
+            res = None
+            break
+        else:
+            sleep(65)
+    return res
 
 
 if __name__ == '__main__':
@@ -142,8 +160,6 @@ if __name__ == '__main__':
     file_name_dict = {}
     for association in associations:
         file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'w+', 1)
-    error_file = open(os.path.join('error', f'errors_{index}.txt'), 'w+', 1)
-    success_file = open(os.path.join('success', f'success_{index}.txt'), 'w+', 1)
 
     session = requests.Session()
     for index, row in df.iterrows():
@@ -159,40 +175,38 @@ if __name__ == '__main__':
                 "https": "https://brd-customer-hl_387a0b46-zone-serp_zone:7j5tinf2e6il@zproxy.lum-superproxy.io:22225",
             }
 
-            response = session.get(serp_url, proxies=serp_proxies, verify=False, timeout=15)
+            response = retry_for_non_200(serp_url, serp_proxies, False, 15)
+            if response is None:
+                continue
             # it returns 10 results by default
             unblocker_urls = extract_url_from_serp_res()
             unblocker_proxies = {
                 'https': 'http://brd-customer-hl_387a0b46-zone-unblocker_1:y1ibmxaapy29@zproxy.lum-superproxy.io:22225'
             }
-            success_file.write(f'unblocker urls extracted for {domain}, {data_source}\n')
             logging.info(f'unblocker urls extracted for {domain}, {data_source}')
             for unblocker_url in unblocker_urls:
                 try:
-                    unblocker_res = session.get(unblocker_url, proxies=unblocker_proxies, verify=False, timeout=15)
+                    unblocker_res = retry_for_non_200(unblocker_url, unblocker_proxies, False, 15)
+                    if unblocker_res is None:
+                        continue
                     serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                     websites = unblocker_dict[data_source]()
-                    success_file.write(f'websites extracted from {unblocker_url}\n')
                     logging.info(f'websites extracted from {unblocker_url}')
                     for website in websites:
                         extracted_domain = extract_domain(website)
                         create_output_file_entry()
+                    sleep(1)
                 except Exception as e:
                     logging.error(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
-                    error_file.write(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url}: {str(e)}\n')
 
             end_time = time()
-            success_file.write(f'{company_id}, {data_source}, Time taken: {end_time - start_time}\n')
             logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
+            sleep(1)
         except Exception as e:
             logging.error(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
-            error_file.write(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}\n')
     base_end_time = time()
-    success_file.write(f'Total time take: {base_end_time - base_start_time}\n')
     logging.info(f'Total time take: {base_end_time - base_start_time}')
     session.close()
-    error_file.close()
-    success_file.close()
     for file in file_name_dict.values():
         file.close()
 
