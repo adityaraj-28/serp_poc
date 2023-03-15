@@ -3,14 +3,11 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, parse_qs
 from time import time
-import logging
 import tldextract
 import re
 import sys
 import os
 from time import sleep
-
-logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
 SERP_DIV_CLASS = "yuRUbf"
 
@@ -122,7 +119,7 @@ def extract_url_from_serp_res():
 def create_output_file_entry():
     domain_matching = 'True' if domain == extracted_domain else 'False'
     _row = f'{company_id}, {data_source}, {domain}, "{unblocker_url}", {serp_data_source_id}, {website}, {extracted_domain}, {domain_matching}\n'
-    logging.info(f'entry: {_row}')
+    print(f'[INFO] entry: {_row}')
     file_name_dict[data_source].write(_row)
     file_name_dict[data_source].flush()
 
@@ -150,7 +147,7 @@ def retry_for_non_200(url, proxies, verify, timeout):
 if __name__ == '__main__':
     arg_length = len(sys.argv)
     if arg_length != 2:
-        logging.error('Incorrect number of arguments')
+        print('[ERROR] Incorrect number of arguments')
         exit()
 
     index = sys.argv[1]
@@ -177,35 +174,37 @@ if __name__ == '__main__':
 
             response = retry_for_non_200(serp_url, serp_proxies, False, 15)
             if response is None:
+                print(f'[ERROR] Max tries reached for {serp_url}')
                 continue
             # it returns 10 results by default
             unblocker_urls = extract_url_from_serp_res()
             unblocker_proxies = {
                 'https': 'http://brd-customer-hl_387a0b46-zone-unblocker_1:y1ibmxaapy29@zproxy.lum-superproxy.io:22225'
             }
-            logging.info(f'unblocker urls extracted for {domain}, {data_source}')
+            print(f'[INFO] unblocker urls extracted for {domain}, {data_source}')
             for unblocker_url in unblocker_urls:
                 try:
                     unblocker_res = retry_for_non_200(unblocker_url, unblocker_proxies, False, 15)
                     if unblocker_res is None:
+                        print(f'[INFO] Max tries reached for {unblocker_url}')
                         continue
                     serp_data_source_id = datasource_serp_id_extractor[data_source](unblocker_url)
                     websites = unblocker_dict[data_source]()
-                    logging.info(f'websites extracted from {unblocker_url}')
+                    print(f'[INFO] websites extracted from {unblocker_url}')
                     for website in websites:
                         extracted_domain = extract_domain(website)
                         create_output_file_entry()
-                    sleep(1)
+                    sleep(0.5)
                 except Exception as e:
-                    logging.error(f'{company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
+                    print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
 
             end_time = time()
-            logging.info(f'{company_id}, {data_source}, Time taken: {end_time - start_time}')
-            sleep(1)
+            print(f'[INFO] {company_id}, {data_source}, Time taken: {end_time - start_time}')
+            sleep(0.5)
         except Exception as e:
-            logging.error(f'{company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
+            print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
     base_end_time = time()
-    logging.info(f'Total time take: {base_end_time - base_start_time}')
+    print(f'[INFO] Total time take: {base_end_time - base_start_time}')
     session.close()
     for file in file_name_dict.values():
         file.close()
