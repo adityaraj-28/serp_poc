@@ -12,6 +12,18 @@ from time import sleep
 SERP_DIV_CLASS = "yuRUbf"
 
 
+def remove_suffix(input_string, suffix):
+    if suffix and input_string.endswith(suffix):
+        return input_string[:-len(suffix)]
+    return input_string
+
+
+def remove_prefix(input_string, prefix):
+    if prefix and input_string.startswith(prefix):
+        return input_string[len(prefix):]
+    return input_string
+
+
 def extract_websites_from_linkedin():
     soup = BeautifulSoup(unblocker_res.text, 'html.parser')
     tag = soup.find('a', {'data-tracking-control-name': 'about_website'})
@@ -76,13 +88,13 @@ def serp_datasource_id_from_appstore_url(url):
     url = remove_ending_slash_from_url(url)
     path = urlparse(url).path
     data_source_ids = path.split('/')[-1]
-    data_source_ids = str(data_source_ids).removeprefix('id')
+    data_source_ids = remove_prefix(str(data_source_ids), 'id')
     return data_source_ids
 
 
 def serp_datasource_id_from_glassdoor_url(url):
     url = remove_ending_slash_from_url(url)
-    url = url.removesuffix('.htm')
+    url = remove_suffix(url, '.htm')
     path = urlparse(url).path
     last_part = str(path.split('/')[-1])
     match = re.search(r"EI_IE(\d+)\.", last_part)
@@ -133,7 +145,11 @@ def retry_for_non_200(url, proxies, verify, timeout):
     tries = 0
     while True:
         res = session.get(url, proxies=proxies, verify=verify, timeout=timeout)
+        print(f'[INFO] {url}, response code: {res.status_code}')
         tries = tries+1
+        if res.status_code == 404:
+            res = None
+            break
         if res.status_code == 200:
             break
         elif tries == 3:
@@ -156,7 +172,7 @@ if __name__ == '__main__':
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
     for association in associations:
-        file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'w+', 1)
+        file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'a', 1)
 
     session = requests.Session()
     for index, row in df.iterrows():
@@ -194,13 +210,13 @@ if __name__ == '__main__':
                     for website in websites:
                         extracted_domain = extract_domain(website)
                         create_output_file_entry()
-                    sleep(0.5)
+                    sleep(1)
                 except Exception as e:
                     print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
 
             end_time = time()
             print(f'[INFO] {company_id}, {data_source}, Time taken: {end_time - start_time}')
-            sleep(0.5)
+            sleep(1)
         except Exception as e:
             print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
     base_end_time = time()
