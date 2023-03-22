@@ -171,8 +171,9 @@ if __name__ == '__main__':
     base_start_time = time()
     associations = ['linkedin', 'glassdoor', 'pitchbook', 'playstore', 'appstore']
     file_name_dict = {}
+    error_file = open('error.txt', 'w+')
     for association in associations:
-        file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'a', 1)
+        file_name_dict[association] = open(os.path.join('result', f'{association}_{index}.txt'), 'w+', 1)
 
     session = requests.Session()
     for index, row in df.iterrows():
@@ -180,6 +181,7 @@ if __name__ == '__main__':
         domain = row['domain']
         company_id = row['company_id']
         data_source = row['entity']
+        entity_id = row['entity_id']
         google_query = row['google_query']
         try:
             serp_url = "https://www.google.com/search?q=" + google_query.replace(' ', '+')
@@ -191,6 +193,8 @@ if __name__ == '__main__':
             response = retry_for_non_200(serp_url, serp_proxies, False, 15)
             if response is None:
                 print(f'[ERROR] Max tries reached for {serp_url}')
+                error_file.write(f'{domain}, {company_id}, {entity_id}, {data_source}, {google_query} : non 200 response\n')
+                error_file.flush()
                 continue
             # it returns 10 results by default
             unblocker_urls = extract_url_from_serp_res()
@@ -198,6 +202,10 @@ if __name__ == '__main__':
                 'https': 'http://brd-customer-hl_387a0b46-zone-unblocker_1:y1ibmxaapy29@zproxy.lum-superproxy.io:22225'
             }
             print(f'[INFO] unblocker urls extracted for {domain}, {data_source}')
+            if len(unblocker_urls) == 0:
+                print(f'[INFO] No unblocker urls found for {domain}, {data_source}')
+                error_file.write(f'[INFO] No unblocker urls found for {domain}, {data_source}')
+                error_file.flush()
             for unblocker_url in unblocker_urls:
                 try:
                     unblocker_res = retry_for_non_200(unblocker_url, unblocker_proxies, False, 15)
@@ -210,18 +218,24 @@ if __name__ == '__main__':
                     for website in websites:
                         extracted_domain = extract_domain(website)
                         create_output_file_entry()
-                    sleep(1)
+                    # sleep(0.3)
                 except Exception as e:
-                    print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query}, {unblocker_url} : {str(e)}')
+                    print(f'[ERROR] {domain}, {company_id}, {entity_id}, {data_source}, {google_query} : {str(e)}')
+                    error_file.write(f'{domain}, {company_id}, {entity_id}, {data_source}, {google_query} : {str(e)}\n')
+                    error_file.flush()
 
             end_time = time()
             print(f'[INFO] {company_id}, {data_source}, Time taken: {end_time - start_time}')
-            sleep(1)
+            # sleep(0.3)
         except Exception as e:
             print(f'[ERROR] {company_id}, {domain}, {data_source}, {google_query} : {str(e)}')
+            error_file.write(f'{domain}, {company_id}, {entity_id}, {data_source}, {google_query} : {str(e)}\n')
+            error_file.flush()
     base_end_time = time()
     print(f'[INFO] Total time take: {base_end_time - base_start_time}')
     session.close()
     for file in file_name_dict.values():
         file.close()
+    error_file.close()
+
 
